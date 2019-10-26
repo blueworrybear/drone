@@ -20,6 +20,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/drone/drone/core"
@@ -36,6 +37,15 @@ var syncPeriod = time.Hour * 24 * 7
 
 // period at which the sync should timeout
 var syncTimeout = time.Minute * 30
+
+var baseURL = "/"
+
+func init() {
+	url := os.Getenv("DRONE_BASE")
+	if url != "" {
+		baseURL = url
+	}
+}
 
 // HandleLogin creates and http.HandlerFunc that handles user
 // authentication and session initialization.
@@ -172,7 +182,7 @@ func HandleLogin(
 		logger.Debugf("authentication successful")
 
 		session.Create(w, user)
-		http.Redirect(w, r, "/", 303)
+		http.Redirect(w, r, baseURL, 303)
 	}
 }
 
@@ -192,7 +202,7 @@ func synchronize(ctx context.Context, syncer core.Syncer, user *core.User) {
 }
 
 func writeLoginError(w http.ResponseWriter, r *http.Request, err error) {
-	http.Redirect(w, r, "/login/error?message="+err.Error(), 303)
+	http.Redirect(w, r, baseURL+"/login/error?message="+err.Error(), 303)
 }
 
 func writeLoginErrorStr(w http.ResponseWriter, r *http.Request, s string) {

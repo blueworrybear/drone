@@ -78,6 +78,9 @@ type (
 		Webhook      Webhook
 		Yaml         Yaml
 
+		// IBM LSF
+		Lsf Lsf
+
 		// Remote configurations
 		Bitbucket Bitbucket
 		Gitea     Gitea
@@ -139,6 +142,12 @@ type (
 		ServiceAccountName string `envconfig:"DRONE_KUBERNETES_SERVICE_ACCOUNT"`
 		PullPolicy         string `envconfig:"DRONE_KUBERNETES_IMAGE_PULL" default:"Always"`
 		Image              string `envconfig:"DRONE_KUBERNETES_IMAGE"`
+	}
+
+	// Lsf provides IBM LSF Configuration
+	Lsf struct {
+		Enabled bool   `envconfig:"DRONE_LSF_ENABLED"`
+		Home    string `envconfig:"DRONE_LSF_HOME"`
 	}
 
 	// Nomad configuration.

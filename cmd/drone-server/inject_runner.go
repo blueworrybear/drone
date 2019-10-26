@@ -15,7 +15,9 @@
 package main
 
 import (
+	"github.com/drone/drone-runtime/engine"
 	"github.com/drone/drone-runtime/engine/docker"
+	"github.com/drone/drone-runtime/engine/lsf"
 	"github.com/drone/drone/cmd/drone-server/config"
 	"github.com/drone/drone/core"
 	"github.com/drone/drone/operator/manager"
@@ -43,12 +45,20 @@ func provideRunner(
 	if config.Nomad.Enabled || config.Kube.Enabled || (config.Agent.Disabled == false) {
 		return nil
 	}
-	engine, err := docker.NewEnv()
-	if err != nil {
-		logrus.WithError(err).
-			Fatalln("cannot load the docker engine")
-		return nil
+	var engine engine.Engine
+	var err error
+	if config.Lsf.Enabled {
+		logrus.Infoln("Start Lsf server at " + config.Lsf.Home)
+		engine = lsf.New(config.Lsf.Home)
+	} else {
+		engine, err = docker.NewEnv()
+		if err != nil {
+			logrus.WithError(err).
+				Fatalln("cannot load the docker engine")
+			return nil
+		}
 	}
+
 	return &runner.Runner{
 		Platform:   config.Runner.Platform,
 		OS:         config.Runner.OS,
